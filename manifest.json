@@ -1,0 +1,18 @@
+{
+  "name": "twitter rate limit counter",
+  "version": "1.0",
+  "manifest_version": 3,
+  "description": "Counts your total viewed tweets on twitter for each day",
+  "action": {
+    "default_popup": "pop_up.html"
+  },
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "run_at": "document_end",
+      "matches": ["https://twitter.com/*"],
+      "css": [],
+      "js": ["js/content_script.js"]
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 let elem;
-let readTweets = 0;
+let tempElem = elem;
+
+let isNewTweet;
 const observer = new IntersectionObserver(handleObserver);
 const updateTimer = setInterval(() => handleUpdateTimer(updateTimer), 1000);
 
@@ -14,12 +16,14 @@ function handleUpdateTimer(timer) {
   if (tempElem) {
     elem = tempElem;
     clearInterval(timer);
-    observeElem();
+    isNewTweet = true;
+    observeElem(elem);
   }
 }
 
 function observeNextElem() {
-  elem = elem.nextElementSibling;
+  tempElem = elem;
+  elem = elem?.nextElementSibling;
 
   if (elem && isAboveViewport(elem)) {
     elem = elem.nextElementSibling;
@@ -27,32 +31,39 @@ function observeNextElem() {
   }
 
   if (elem) {
-    return observeElem();
+    isNewTweet = true;
+    return observeElem(elem);
   }
 
-  const timer = setInterval(() => handleUpdateTimer(timer), 1000);
+  elem = tempElem;
+  isNewTweet = false;
+  observeElem(elem);
 }
 
 function isAboveViewport(elem) {
   return elem.getBoundingClientRect().y < 0;
 }
 
-function observeElem() {
+function observeElem(elem) {
   observer.observe(elem);
 }
 
 function handleIntersection() {
-  observer.unobserve(elem);
+  try {
+    observer.unobserve(elem);
+  } catch (error) {
+    //elem is null
+  }
   observeNextElem();
-  saveToLocalStorage(readTweets);
+  isNewTweet && saveToLocalStorage();
 }
 
-async function saveToLocalStorage(readTweets) {
+async function saveToLocalStorage() {
   const prevCount = await getPrevSavedCount();
 
   try {
     chrome.storage.local.set({
-      noOfTweet2342: readTweets + Number(prevCount + 1),
+      noOfTweet2342: Number(prevCount + 1),
     });
   } catch (err) {
     alert("unable to save your rate limit count to localstorage");
@@ -62,11 +73,8 @@ async function saveToLocalStorage(readTweets) {
 async function getPrevSavedCount() {
   try {
     const count = await chrome.storage.local.get(["noOfTweet2342"]);
-    console.log(count.noOfTweet2342);
-    if (count.noOfTweet2342) {
-      return count.noOfTweet2342;
-    }
-    return 0;
+    console.log(count.noOfTweet2342 ?? 0);
+    return count.noOfTweet2342 ?? 0;
   } catch (err) {
     // alert("unable to retrieve data");
   }

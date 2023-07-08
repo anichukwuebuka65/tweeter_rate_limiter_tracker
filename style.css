@@ -36,21 +36,6 @@ body {
   font-size: 2rem;
 }
 
-.nav {
-  margin-bottom: 2rem;
-}
-.nav__container {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.nav__container li {
-  list-style-type: none;
-  font-weight: bold;
-  font-size: 1.25rem;
-}
-
 .limit__date {
   color: var(--accent-100);
   font-size: 1rem;
